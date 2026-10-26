@@ -1,0 +1,11 @@
+node_modules/
+dist/
+docs/
+release/
+.git/
+.env
+.env.*
+*.log
+*.pid
+__pycache__/
+evidence-projects.md

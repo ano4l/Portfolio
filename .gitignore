@@ -1,6 +1,7 @@
 dist/
 release/
 node_modules/
+.vercel/
 __pycache__/
 public/office.js
 docs/*

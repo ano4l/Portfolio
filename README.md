@@ -9,7 +9,7 @@ A statically generated personal portfolio with a Three.js office scene. Project 
 - `npm run dev` builds once and serves http://localhost:4173.
 - After source edits run `npm run build`, then refresh the browser.
 
-Requires a current Node.js runtime. No API keys required. Serve only `dist/`, never the workspace root: audit notes contain private local paths.
+Requires Node.js 22.x. No API keys required. Serve only `dist/`, never the workspace root: audit notes contain private local paths.
 
 ## Authored studio prototype
 
@@ -19,7 +19,17 @@ The checked-in GLB and poster are sufficient for ordinary builds. Blender is an 
 
 ## Deploy
 
-Use a static host with build command `npm run build` and output directory `dist`. Each route has its own `index.html`; directory URLs and direct links work without a single-page-app rewrite. Configure the host to serve `404.html` with status 404. Set `SITE_URL` to the final HTTPS origin before building to produce canonical and absolute social-image URLs. No deployment has been performed.
+The repository includes `vercel.json`. In Vercel, import `ano4l/Portfolio`, select the `main` branch and keep the Root Directory at `./`. The configuration selects the **Other** framework, installs with `npm ci --include=dev`, builds with `npm run build` and publishes only `dist/`. `package.json` pins Node.js 22.x. No API keys, Blender installation, database or serverless functions are required.
+
+Each route has its own `index.html`. Trailing slashes match the existing links; direct case-study URLs work without a single-page-app rewrite. Vercel serves the generated `404.html` for unknown paths. Unversioned files revalidate on repeat visits, so new scenes and CV updates are not trapped in a long browser cache. Baseline response headers retain same-origin PDF previews.
+
+The canonical origin is selected in this order: optional `SITE_URL`, Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, then `VERCEL_URL`. An explicit `SITE_URL` must be a complete origin such as `https://your-domain.com`, without a path. Normally no manual environment variable is needed when Vercel exposes its system environment variables. Update `SITE_URL` if you use it and later change domains.
+
+Production builds with an origin generate absolute canonical/social URLs, `robots.txt` and a sitemap containing all portfolio pages. Preview builds use `noindex,nofollow`, disallow crawling and omit the sitemap. Local builds without an origin omit canonical/social-image URLs and the sitemap.
+
+The ordinary homepage remains the constructed room; the Blender-authored prototype is available at `/?studio=1`, including after deployment.
+
+Before importing, run `npm ci`, `npm run test:deployment`, `npm run build`, and `python docs/check-links.py` locally. After Vercel deploys, verify the homepage and `/?studio=1`, a direct case-study link such as `/work/novalens/`, mobile panning, CV preview/download, `/sitemap.xml`, and an unknown URL returning the custom 404 with HTTP status 404. No Vercel deployment has been performed as part of this preparation.
 
 ## Content
 

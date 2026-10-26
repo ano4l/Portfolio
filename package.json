@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
+    "test:deployment": "node --test scripts/site-config.test.mjs",
     "studio:prepare": "node scripts/prepare-studio.mjs",
     "studio:fetch": "node scripts/fetch-studio-assets.mjs",
     "studio:render": "node scripts/render-studio.mjs",
