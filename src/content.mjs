@@ -541,3 +541,18 @@ export const projects = [
     ]
   }
 ];
+
+export const moments = [
+  { year: 2024, date: "2024", title: "AWS ExecLeaders", event: "AWS ExecLeaders", image: "aws-execleaders-2024.webp", width: 640, height: 480, alt: "Anotida at the blue AWS Summit Johannesburg ExecLeaders backdrop." },
+  { year: 2024, date: "2024", title: "Fall in love with the problem", event: "AWS Summit Johannesburg", image: "aws-problem-first-2024.webp", width: 1200, height: 1600, alt: "A conference speaker beside a projected slide reading ‘Fall in love with the problem, not the solution’." },
+  { year: 2024, date: "2024", title: "AWS Summit Johannesburg", event: "AWS Summit", image: "aws-summit-johannesburg-2024.webp", width: 1200, height: 1600, alt: "Anotida standing beside the AWS Summit Johannesburg event sign." },
+  { year: 2024, date: "October 2024", title: "AI Expo Africa with SAAIA", event: "AI Expo Africa · SAAIA", image: "ai-expo-africa-saaia-2024.webp", width: 1200, height: 1600, alt: "Anotida at AI Expo Africa, standing beside another attendee." },
+  { year: 2024, date: "October 2024", title: "A badge from AI Expo Africa", event: "AI Expo Africa · SAAIA", image: "ai-expo-africa-badge-2024.webp", width: 900, height: 1600, alt: "Anotida Dzinotyiwei’s AI Expo Africa 2024 badge, identifying VirtuKey Technologies and SAAIA." },
+  { year: 2025, date: "August 2025", title: "AWS ExecLeaders", event: "AWS Summit Johannesburg", image: "aws-execleaders-aug-2025.webp", width: 1200, height: 1600, alt: "Anotida at AWS ExecLeaders in front of the purple AWS Summit Johannesburg backdrop." },
+  { year: 2025, date: "2025", title: "In the room", event: "AWS event", image: "aws-summit-seats-2025.webp", width: 1200, height: 1600, alt: "A view across blue chairs toward an AWS event stage." },
+  { year: 2026, date: "July 2026", title: "Google Cloud Summit", event: "Johannesburg", image: "google-cloud-summit-2026.webp", width: 1200, height: 1600, alt: "Google Cloud Summit signage on the Johannesburg event floor." },
+  { year: 2026, date: "July 2026", title: "The summit badge", event: "Google Cloud Summit", image: "google-cloud-badge-2026.webp", width: 900, height: 1600, alt: "Anotida’s Google Cloud Summit Johannesburg 2026 media badge." },
+  { year: 2026, date: "July 2026", title: "A keynote at Google Cloud Summit", event: "Johannesburg", image: "google-cloud-keynote-2026.webp", width: 1200, height: 1600, alt: "A keynote session on the Google Cloud Summit stage." },
+  { year: 2026, date: "September 2026", title: "Digital crime, spam and scams", event: "Truecaller × Mail & Guardian", image: "truecaller-forum-stage-2026.webp", width: 1200, height: 1600, alt: "The Truecaller and Mail & Guardian forum stage for a discussion about digital crime, spam and scams." },
+  { year: 2026, date: "September 2026", title: "A live forum, on air", event: "YouTube · Truecaller × Mail & Guardian", image: "truecaller-live-youtube-2026.webp", width: 1170, height: 851, alt: "YouTube screenshot of the Truecaller Critical Thinking Forum livestream." }
+];
