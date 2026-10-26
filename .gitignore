@@ -1,0 +1,14 @@
+dist/
+release/
+node_modules/
+public/office.js
+docs/*
+!docs/PERFORMANCE.md
+!docs/PICKUP-AND-CONTENT.md
+!docs/check-links.py
+*.log
+*.pid
+.env
+.env.*
+!.env.example
+evidence-projects.md
