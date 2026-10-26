@@ -2,7 +2,7 @@ export const person = {
   "name": "Anotida Dzinotyiwei",
   "email": "anodzino@gmail.com",
   "linkedin": "https://www.linkedin.com/in/anotida-dzinotyiwei117a4a2a0",
-  "intro": "I build apps, websites, and ideas I want to see exist."
+  "intro": "I build systems, apps, websites, and ideas I want to see exist."
 };
 
 export const projects = [

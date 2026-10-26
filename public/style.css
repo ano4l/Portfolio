@@ -74,6 +74,17 @@ footer a:hover {  text-decoration:underline  }
 .experience h2 {  font-size:24px;font-weight:500;margin:0  }
 .experience span {  font:11px 'Courier New',monospace  }
 .experience p {  font-size:14px;margin:0  }
+.experience-row { display:grid;grid-template-columns:minmax(150px,.7fr) minmax(220px,1fr) minmax(270px,1.35fr);gap:26px;align-items:start;border-top:1px solid #c8c5ba;padding:25px 0; }
+.experience-date { padding-top:8px;color:#696354;font:11px/1.5 'Courier New',monospace!important; }
+.experience-position h2 { font-size:22px;line-height:1.25;font-weight:500;letter-spacing:-.03em;margin:0 0 6px; }
+.experience-position p { font-size:13px;color:#696354;line-height:1.55; }
+.experience-detail { border-bottom:1px solid #d2cbbc; }
+.experience-detail summary { display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:44px;cursor:pointer;color:#3155a4;font-size:12px;list-style:none; }
+.experience-detail summary::-webkit-details-marker { display:none; }
+.experience-detail summary:focus-visible { outline:2px solid #3155a4;outline-offset:3px; }
+.experience-toggle { display:grid;width:28px;height:28px;place-items:center;border:1px solid #b7ae9c;border-radius:50%;font:18px/1 Manrope,sans-serif!important;transition:transform .2s ease; }
+.experience-detail[open] .experience-toggle { transform:rotate(45deg); }
+.experience-detail>p { padding:2px 28px 17px 0;color:#575248;font-size:13px;line-height:1.75; }
 .contact .email {  font-size:clamp(19px,3vw,37px);letter-spacing:-.03em;display:block;color:#2044f5;margin:50px 0 20px  }
 .contact {  min-height:65vh  }
 .sketch-entry {  max-width:850px;margin:80px auto;background:#faf8ef;padding:50px;box-shadow:4px 9px 30px #0001;transform:rotate(-1deg)  }
@@ -141,6 +152,11 @@ footer>span {  display:none  }
 .experience>div {  display:block;padding:24px 0  }
 .experience h2 {  margin:12px 0 7px;font-size:23px  }
 .experience p {  font-size:14px  }
+.experience-row { grid-template-columns:1fr;gap:9px;padding:22px 0; }
+.experience-date { padding-top:0; }
+.experience-position h2 { margin:0 0 3px;font-size:22px; }
+.experience-detail summary { min-height:46px; }
+.experience-detail>p { padding-right:0;padding-bottom:16px;font-size:13px; }
 .contact .email {  font-size:22px;letter-spacing:-.05em  }
 .sketch-entry {  margin:50px 7%;padding:28px  }
 .sketch-entry h2 {  font-size:42px  }
