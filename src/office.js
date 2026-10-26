@@ -2,21 +2,29 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { loadStudioAssets } from './studio-assets.js';
 
 const stage = document.querySelector('.office-stage');
 const canvas = document.querySelector('#office-canvas');
 const world = document.querySelector('.office-world');
 const pan = document.querySelector('.office-pan');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-if (stage && canvas) init().catch(error => { console.warn('Office preview unavailable:', error.message); });
+const requestedStudio = new URLSearchParams(location.search).get('studio') === '1';
+if (stage && canvas) {
+  if (requestedStudio) stage.dataset.officeLoading = 'true';
+  init().catch(error => {
+    delete stage.dataset.officeLoading;
+    console.warn('Office preview unavailable:', error.message);
+  });
+}
 
 async function init() {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
-  const mobileDevice=matchMedia('(pointer: coarse)').matches;
+  const mobileDevice=matchMedia('(pointer: coarse)').matches || stage.clientWidth<=1100;
   const maxPixelRatio=mobileDevice?1:1.25;
   renderer.setPixelRatio(Math.min(devicePixelRatio,maxPixelRatio));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -44,6 +52,7 @@ async function init() {
   const fill = new THREE.DirectionalLight('#a7b8cf', .22);fill.position.set(5,4,-1);scene.add(fill);
   const sunset = new THREE.SpotLight('#ffab62', 95, 30, .62, .85, 2);
   sunset.position.set(-5,6,4);sunset.target.position.set(0,1,0);scene.add(sunset,sunset.target);
+  sunset.target.userData.keepStudio = true;
   const glow = new THREE.PointLight('#ffca89', 2.4, 7, 2);glow.position.set(-4.1,3.2,-1.8);scene.add(glow);
   const objects = new Map();
   const textureLoader = new THREE.TextureLoader();
@@ -149,12 +158,45 @@ async function init() {
   for(const x of [-.98,.98])for(let j=0;j<9;j++)box(laptop,.014,.002,.03,mat('#757b7b'),x,.097,-.3+j*.075);
   for(const x of [-1.03,1.03])for(const z of[-.47,.84]){const screw=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.003,12),mat('#555c60',.3,.7));screw.position.set(x,.089,z);laptop.add(screw);}
   const screenGlow=new THREE.PointLight('#c2ccdf',.9,2.5,2);screenGlow.position.set(0,1.4,.2);monitor.add(screenGlow);
+  let authoredStudio = false;
+  if (requestedStudio) {
+    try {
+      await loadStudioAssets(scene, objects, renderer);
+      authoredStudio = true;
+      renderer.toneMapping = THREE.AgXToneMapping;
+      renderer.toneMappingExposure = 1;
+      renderer.shadowMap.type = THREE.PCFShadowMap;
+      scene.background.set('#292822');
+      scene.fog.color.set('#292822');
+      sun.color.set('#ffe2b7');
+      sun.position.set(-7, 8, -10);
+      sun.intensity = 2.3;
+      sun.target.position.set(0, .7, 0);
+      scene.add(sun.target);
+      sun.shadow.normalBias = .02;
+      sun.shadow.radius = 3;
+      sun.shadow.blurSamples = 6;
+      Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, far: 35 });
+      sun.shadow.camera.updateProjectionMatrix();
+      fill.intensity = .35;
+      sunset.intensity = 6;
+      sunset.angle = .9;
+      sunset.position.set(-4, 7, 2);
+      glow.intensity = .4;
+      renderer.shadowMap.needsUpdate = true;
+      stage.dataset.officeQuality = 'authored';
+    } catch (error) {
+      console.warn('Authored studio unavailable; using the constructed office:', error.message);
+    }
+  }
   // Collapse repeated static meshes to one draw per material, preserving each pickable group.
   scene.updateMatrixWorld(true);
   const interactiveGroups=new Set([...objects.values()].map(o=>o.group));
   function batchMeshes(root,skipInteractive=false){const batches=new Map(),remove=[];root.updateWorldMatrix(true,true);const inverse=root.matrixWorld.clone().invert();function collect(node){if(skipInteractive&&interactiveGroups.has(node))return;if(node.isMesh&&!node.isInstancedMesh&&!Array.isArray(node.material)){let g=node.geometry.clone();if(g.index)g=g.toNonIndexed();g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse,node.matrixWorld));const key=node.material.uuid+':'+node.castShadow+':'+node.receiveShadow;if(!batches.has(key))batches.set(key,{material:node.material,cast:node.castShadow,receive:node.receiveShadow,geometries:[]});batches.get(key).geometries.push(g);remove.push(node);}else if(!node.isInstancedMesh)for(const child of node.children)collect(child);}for(const child of root.children)collect(child);for(const node of remove)node.removeFromParent();for(const b of batches.values()){const geometry=mergeGeometries(b.geometries,false);b.geometries.forEach(g=>g.dispose());const mesh=new THREE.Mesh(geometry,b.material);mesh.castShadow=b.cast;mesh.receiveShadow=b.receive;root.add(mesh);}}
-  for(const o of objects.values())batchMeshes(o.group);
-  batchMeshes(scene,true);
+  if (!authoredStudio) {
+    for(const o of objects.values())batchMeshes(o.group);
+    batchMeshes(scene,true);
+  }
   // The office is static at rest. Only pointer/focus transitions schedule frames.
   const anchors=[...stage.querySelectorAll('[data-office-object]')];
   const entries=[...objects.entries()];
@@ -192,6 +234,8 @@ async function init() {
     if(object)object.group.visible=false;
     // One cached scene frame hands the object to its compositor-animated preview.
     // The modal then pauses WebGL until the object is returned.
+    renderer.shadowMap.needsUpdate = true;
+    shadowCount++;
     renderer.render(scene,camera);renderCount++;
   });
   let pointerStart=null,moved=false;
@@ -209,7 +253,7 @@ async function init() {
   function measureLabels(){for(const a of anchors)labelState.get(a).half=a.offsetWidth/2+12;invalidate();}
   const labelObserver=new ResizeObserver(measureLabels);anchors.forEach(a=>labelObserver.observe(a));
   function resize(){renderWidth=world.clientWidth;renderHeight=world.clientHeight;renderer.setSize(renderWidth,renderHeight,false);camera.aspect=renderWidth/renderHeight;camera.fov=39;cameraGoal.copy(cameraBase);lookGoal.set(0,stage.clientWidth<=1100?1.65:1.05,0);camera.position.copy(cameraGoal);camera.lookAt(lookGoal);camera.zoom=1;camera.updateProjectionMatrix();camera.updateMatrixWorld();const bounds=new THREE.Box3(new THREE.Vector3(-5,.7,-2.65),new THREE.Vector3(5,3.0,2.65));let min=1,max=-1;for(const x of[bounds.min.x,bounds.max.x])for(const y of[bounds.min.y,bounds.max.y])for(const z of[bounds.min.z,bounds.max.z]){const v=new THREE.Vector3(x,y,z).project(camera);min=Math.min(min,v.x);max=Math.max(max,v.x);}zoomGoal=Math.min(1.85/(max-min),1.12);camera.zoom=zoomGoal;target.copy(lookGoal);camera.updateProjectionMatrix();worldRect=world.getBoundingClientRect();measureLabels();invalidate();}
-  new ResizeObserver(resize).observe(world);resize();stage.dataset.officeReady='true';
+  new ResizeObserver(resize).observe(world);resize();stage.dataset.officeReady='true';delete stage.dataset.officeLoading;
   if(stage.clientWidth<=1100&&pan){pan.scrollLeft=(world.clientWidth-pan.clientWidth)*.49;worldRect=world.getBoundingClientRect();}
   const tmp=new THREE.Vector3(),lightGoal=new THREE.Vector3();
   let lastRenderTime=0,slowFrames=0,qualityScale=1,interactionScale=1,restoreTimer=0;
@@ -224,11 +268,11 @@ async function init() {
     const dx=xx-camera.position.x,dy=yy-camera.position.y;
     if(Math.abs(dx)+Math.abs(dy)>.0005){camera.position.x+=dx*ease;camera.position.y+=dy*ease;moving=true;}else{camera.position.x=xx;camera.position.y=yy;}
     camera.lookAt(target);camera.updateMatrixWorld();
-    lightGoal.set(noMotion?0:pointer.x*8,1,noMotion?0:pointer.y*5);
+    lightGoal.set(noMotion?0:pointer.x*(authoredStudio?1.8:8),1,noMotion?0:pointer.y*(authoredStudio?1.2:5));
     if(sunset.target.position.distanceToSquared(lightGoal)>.00001){sunset.target.position.lerp(lightGoal,ease);moving=true;}else sunset.target.position.copy(lightGoal);
-    const lightX=-5+(noMotion?0:pointer.x*2),dl=lightX-sunset.position.x;
+    const lightX=(authoredStudio?-4:-5)+(noMotion?0:pointer.x*(authoredStudio?.3:2)),dl=lightX-sunset.position.x;
     if(Math.abs(dl)>.001){sunset.position.x+=dl*ease;moving=true;}else sunset.position.x=lightX;
-    for(const[id,o]of entries){const desired=noMotion?0:Number(active===id);const dh=desired-o.hover;if(Math.abs(dh)>.001){o.hover+=dh*ease;moving=true;}else o.hover=desired;o.group.position.y=o.baseY+o.hover*.065;}
+    for(const[id,o]of entries){const desired=noMotion?0:Number(active===id);const dh=desired-o.hover;if(Math.abs(dh)>.001){o.hover+=dh*ease;moving=true;}else o.hover=desired;const lift=authoredStudio?(['novalens','forma'].includes(id)?.018:.045):.065;o.group.position.y=o.baseY+o.hover*lift;}
     // Batch projection and transform writes; no per-frame DOM measurements/layout.
     for(const a of anchors){const id=a.dataset.officeObject,o=objects.get(id),label=labelState.get(a);tmp.copy(hotspotOffsets[id]);o.group.updateWorldMatrix(true,false);o.group.localToWorld(tmp);tmp.project(camera);const x=Math.max(label.half,Math.min(renderWidth-label.half,(tmp.x*.5+.5)*renderWidth)),y=Math.max(130,Math.min(renderHeight-95,(-tmp.y*.5+.5)*renderHeight));if(!Number.isFinite(label.x)||Math.abs(x-label.x)+Math.abs(y-label.y)>.25){a.style.left='0';a.style.top='0';a.style.transform=`translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) translate(-50%,-50%)`;label.x=x;label.y=y;}const hovered=active===id;if(label.hover!==hovered){a.classList.toggle('is-hovered',hovered);label.hover=hovered;}}
     if(renderer.shadowMap.needsUpdate)shadowCount++;
@@ -240,7 +284,7 @@ async function init() {
   new IntersectionObserver(([entry])=>{intersecting=entry.isIntersecting;if(!intersecting){cancelAnimationFrame(frame);frame=0;}else invalidate();},{threshold:0}).observe(stage);
   const dialog=document.querySelector('#object-dialog');
   if(dialog?.open){modalOpen=true;cancelAnimationFrame(frame);frame=0;}
-  if(dialog)new MutationObserver(()=>{modalOpen=dialog.open;if(modalOpen){cancelAnimationFrame(frame);frame=0;}else{if(picked){objects.get(picked).group.visible=true;picked=null;}invalidate();}}).observe(dialog,{attributes:true,attributeFilter:['open']});
+  if(dialog)new MutationObserver(()=>{modalOpen=dialog.open;if(modalOpen){cancelAnimationFrame(frame);frame=0;}else{if(picked){objects.get(picked).group.visible=true;picked=null;renderer.shadowMap.needsUpdate=true;}invalidate();}}).observe(dialog,{attributes:true,attributeFilter:['open']});
   reduced.addEventListener('change',invalidate);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();visible=false;cancelAnimationFrame(frame);frame=0;delete stage.dataset.officeReady;});
 }

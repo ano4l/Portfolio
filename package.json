@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "studio:prepare": "node scripts/prepare-studio.mjs",
+    "studio:fetch": "node scripts/fetch-studio-assets.mjs",
+    "studio:render": "node scripts/render-studio.mjs",
+    "studio:pack": "node scripts/pack-studio.mjs",
     "build": "node scripts/bundle.mjs && node src/build.mjs",
     "dev": "node scripts/bundle.mjs && node src/server.mjs",
     "start": "node scripts/bundle.mjs && node src/server.mjs"
@@ -12,6 +16,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5"
   }
 }

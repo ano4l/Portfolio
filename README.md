@@ -11,6 +11,12 @@ A statically generated personal portfolio with a Three.js office scene. Project 
 
 Requires a current Node.js runtime. No API keys required. Serve only `dist/`, never the workspace root: audit notes contain private local paths.
 
+## Authored studio prototype
+
+Open `http://localhost:4173/?studio=1` for the Blender-authored room. The standard homepage remains available for comparison. The prototype includes curved paper, custom electronics, genuine screen/CV textures, a CC0 articulated lamp and walnut material, denoised Cycles diffuse bakes, and live reflections and object shadows. It retains native mobile panning and accessible object previews.
+
+The checked-in GLB and poster are sufficient for ordinary builds. Blender is an optional offline authoring tool. To regenerate assets, run `npm run studio:fetch`, `npm run studio:prepare`, `npm run studio:render`, then `npm run studio:pack`. The rendering step needs Blender; the fetch step verifies CC0 source-file checksums. See [the prototype notes](docs/STUDIO-PROTOTYPE.md) for setup, rendering details, asset credits and verification limits.
+
 ## Deploy
 
 Use a static host with build command `npm run build` and output directory `dist`. Each route has its own `index.html`; directory URLs and direct links work without a single-page-app rewrite. Configure the host to serve `404.html` with status 404. Set `SITE_URL` to the final HTTPS origin before building to produce canonical and absolute social-image URLs. No deployment has been performed.
