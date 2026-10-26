@@ -38,7 +38,7 @@ const previews = {
   },
   "digital-twin": {
     "name": "Digital Twin",
-    "text": "Systems and data engineering. A broad overview of connected information and monitoring, without private implementation details.",
+    "text": "Real-time ML-system observability: a Python telemetry pipeline using Kafka and Flink for event processing, Redis for state, and Grafana and Prometheus for monitoring and alerts.",
     "url": "/work/digital-twin/",
     "artifact": "note"
   },
@@ -70,6 +70,7 @@ const previews = {
     "url": "/cv/",
     "cta": "View experience & CV",
     "download": true,
+    "document": true,
     "artifact": "cv"
   },
   "collection": {
@@ -127,13 +128,13 @@ function artifactMarkup(preview) {
 
 function renderPreview(preview, projectId) {
   const notes = projectNotes[projectId];
+  const visual = preview.document
+    ? `<div class="pickup-artifact artifact-cv"><iframe src="/assets/anotida-dzinotyiwei-cv.pdf#view=FitH" title="Anotida Dzinotyiwei’s CV preview" loading="lazy"></iframe></div><p class="pickup-caption">A quick look at my supplied CV. Scroll inside the document to read; open or download the PDF for the full-page view.</p>`
+    : `<div class="pickup-artifact artifact-${preview.artifact}">${artifactMarkup(preview)}</div>${preview.caption ? `<p class="pickup-caption">${escapeText(preview.caption)}</p>` : ''}`;
   document.querySelector('#dialog-content').innerHTML = `
-    <div class="pickup-layout">
-      <div class="pickup-visual">
-        <div class="pickup-artifact artifact-${preview.artifact}">${artifactMarkup(preview)}</div>
-        ${preview.caption ? `<p class="pickup-caption">${escapeText(preview.caption)}</p>` : ''}
-      </div>
-      <div class="pickup-copy">
+    <div class="pickup-layout${preview.document ? ' pickup-layout-cv' : ''}">
+      <div class="pickup-visual${preview.document ? ' pickup-visual-cv' : ''}">${visual}</div>
+      <div class="pickup-copy${preview.document ? ' pickup-copy-cv' : ''}">
         <p class="small">From my table</p>
         <h2 id="dialog-title">${escapeText(preview.name)}</h2>
         <p class="pickup-description" id="pickup-description">${escapeText(notes?.summary || preview.text)}</p>
@@ -141,6 +142,7 @@ function renderPreview(preview, projectId) {
         <div class="pickup-actions">
           <a class="button" href="${preview.url}">${escapeText(preview.cta || 'Open the story')} <span aria-hidden="true">↗</span></a>
           ${preview.artifact==='phone'?'<a class="text-link pickup-related" href="/work/dala/">Also on the iPhone: Dala ↗</a>':''}
+          ${preview.document ? '<a class="text-link modal-open-pdf" href="/assets/anotida-dzinotyiwei-cv.pdf" target="_blank" rel="noopener">Open full PDF ↗</a>' : ''}
           ${preview.download ? '<a class="text-link modal-download" href="/assets/anotida-dzinotyiwei-cv.pdf" download>Download CV PDF ↓</a>' : ''}
         </div>
       </div>
@@ -158,7 +160,7 @@ function transformToOrigin(rect) {
   const scale = Math.max(.08, Math.min(.95, origin.width / rect.width, origin.height / rect.height));
   const x = origin.left + origin.width / 2 - rect.left - rect.width / 2;
   const y = origin.top + origin.height / 2 - rect.top - rect.height / 2;
-  const tilt = dialog.dataset.artifact === 'screen' ? 6 : 38;
+  const tilt = dialog.dataset.artifact === 'screen' ? 6 : dialog.dataset.artifact === 'cv' ? 2 : 38;
   return `translate3d(${x}px, ${y}px, 0) scale(${scale}) rotateX(${tilt}deg) rotateY(-9deg) rotateZ(-3deg)`;
 }
 

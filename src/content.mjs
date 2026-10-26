@@ -149,17 +149,26 @@ export const projects = [
   {
     "slug": "digital-twin",
     "name": "Digital Twin",
-    "kind": "Systems · High-level overview",
-    "title": "Making connected systems easier to understand.",
-    "summary": "Systems and data engineering work concerned with how connected information becomes useful operational awareness.",
-    "status": "Overview only",
-    "role": "Engineering work",
-    "steps": [],
-    "decisions": [],
-    "challenge": "Working across connected systems means considering how different parts contribute to an understandable whole.",
-    "limit": "This public overview intentionally excludes implementation details, system internals and actual project content.",
-    "audience": "For understanding connected information in a monitoring context.",
-    "outcome": "This page is deliberately a broad account of the work. Further system details remain outside the public portfolio."
+    "kind": "Decision Boundary Alpha · Observability",
+    "title": "A real-time view into live machine-learning systems.",
+    "summary": "I build a Python telemetry pipeline for live ML-system observability, processing events with Apache Kafka and Flink and supporting monitoring with Redis, Grafana and Prometheus.",
+    "status": "Observability Stack Developer · Feb 2026—present",
+    "role": "Python telemetry pipeline and observability engineering at Decision Boundary Alpha",
+    "steps": ["Collect system telemetry", "Process event streams", "Maintain low-latency state", "Monitor and alert"],
+    "journeyDetails": [
+      "Telemetry from live ML systems enters a Python pipeline. My CV describes this work as supporting real-time observability.",
+      "Apache Kafka and Flink support event-driven stream processing through the pipeline.",
+      "Redis is used for low-latency caching and state management.",
+      "Grafana and Prometheus provide monitoring dashboards and alerting."
+    ],
+    "decisions": [
+      ["Process telemetry as a stream", "My CV names Kafka and Flink for event-driven stream processing, keeping the work focused on ongoing system signals."],
+      ["Connect state with observability", "Redis supports low-latency caching and state; Grafana and Prometheus make monitoring and alerting part of the operational view."]
+    ],
+    "challenge": "A useful monitoring view depends on a timely path from telemetry, through stream processing and state, to dashboards and alerts. The work spans that whole observability chain.",
+    "limit": "This account reflects the role and tools listed in my supplied CV. The portfolio does not show live telemetry, private system details or independently measured service outcomes.",
+    "audience": "Engineers and teams responsible for understanding the health of live ML systems.",
+    "outcome": "My CV describes a real-time Python telemetry pipeline using Kafka and Flink, Redis for state and caching, and Grafana and Prometheus dashboards and alerts."
   },
   {
     "slug": "tradeos",
